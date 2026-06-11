@@ -31,7 +31,7 @@ Pattern worth reusing for any mesa dashboard:
 - **Mesa version: 3.4.1**, Python 3.14, own venv. `mesa.discrete_space` for grid + PropertyLayers; `PropertyLayer.data` is a raw numpy array (vectorize evap/deposit on it).
 - **`ColonyModel.__init__` spells out every field** (no `**kwargs`). This was originally to satisfy SolaraViz introspection; kept because `test_model_signature_matches_params` guards it against `ColonyParams` drift and it's clean.
 - Verify Solara changes in a **real browser (Playwright)**, not just by importing `app.py`. Every UI bug here (PropertyLayerStyle shape, the render-loop guard, the missing `anywidget` dep) surfaced only on render, never on import.
-- **SolaraViz history** (no longer used, kept as warning): it forces every component to half-grid-width (`make_initial_grid_layout` → `"w": 6`), wants a callable `propertylayer_portrayal` (dict-of-PropertyLayerStyle errors), and rejects `**kwargs` init. Fighting all that is why we went Solara-direct. See [[reference_mesa_solaraviz_limits]].
+- **SolaraViz history** (no longer used, kept as warning): it forces every component to half-grid-width (`make_initial_grid_layout` → `"w": 6`), wants a callable `propertylayer_portrayal` (dict-of-PropertyLayerStyle errors), and rejects `**kwargs` init. Fighting all that is why we went Solara-direct.
 
 ## Scale
 

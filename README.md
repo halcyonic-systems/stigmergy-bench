@@ -2,6 +2,8 @@
 
 A small, tunable agent-based model of **stigmergy as a coordination protocol**, and what happens to it under adversarial agents. It reimplements and generalizes Aswale, López, Ammartayakun, and Pinciroli, *"Hacking the Colony: On the Disruptive Effect of Misleading Pheromone and How to Defend Against It"* (AAMAS 2022, [arXiv:2202.01808](https://arxiv.org/abs/2202.01808)).
 
+![The dashboard: a colony foraging while detractors lay a forged trail web, with live capture-vs-liveness charts](images/dashboard.png)
+
 ## Why this exists
 
 Stigmergy is environment-mediated coordination: agents write signals into a shared medium (pheromone) and read them back, with no direct messaging and no central authority. The trail *is* the protocol. The paper's result is that this protocol has a sharp adversarial cliff. A small minority of "detractors" depositing **indistinguishable** misleading pheromone gets honest agents to reinforce each other's fake trails, and foraging collapses. The defense, a second-order "cautionary" signal, buys safety at the cost of liveness.
@@ -62,8 +64,18 @@ src/
   metrics.py     capture-vs-liveness reporters
   sweep.py       batch_run -> Fig-4 heatmap
 analysis.py      render heatmap + field snapshots (no Solara needed)
-app.py           SolaraViz interactive dashboard
+app.py           interactive dashboard (built directly on Solara)
 tests/           mechanism invariants
 ```
 
 The headless path (`sweep.py` + `analysis.py`) reproduces the paper's result with matplotlib alone. The Solara dashboard is an enhancement on top, not a dependency of the result.
+
+## Origins & credits
+
+The model comes from Aswale et al., *"Hacking the Colony"* (AAMAS 2022, [arXiv:2202.01808](https://arxiv.org/abs/2202.01808)); their parameter table (rescaled) and two attack/defense mechanisms are the specification this bench implements. The paper's experiments ran on the [NESTLab/AntSimulator](https://github.com/NESTLab/AntSimulator) C++ fork of [johnBuffer/AntSimulator](https://github.com/johnBuffer/AntSimulator). This repository is an **independent, from-scratch reimplementation in Python** ([Mesa 3](https://github.com/projectmesa/mesa)), not a port of that code, refactored so that the coordination protocol itself is the swappable object of study.
+
+Built as part of [Halcyonic Systems](https://github.com/halcyonic-systems) work on formal protocol theory and the common core of systems science.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
