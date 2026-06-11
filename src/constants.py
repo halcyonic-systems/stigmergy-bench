@@ -37,7 +37,10 @@ class ColonyParams:
     sensing_radius: int = 3                     # cells; paper l^s_max=40 units ~ 10 cells
     n_probes: int = 12                          # paper chi=32 probing vectors
     heading_cone: float = 0.8                   # * pi; paper theta^s_max=0.8*pi
-    turn_noise: float = 0.1                     # * pi; paper eta=0.1*pi
+    turn_noise: float = 0.1                     # * pi; eta, applied while following a trail
+    wander_noise: float = 0.35                  # * pi; larger turn when NO trail is sensed, so
+                                                #   searchers explore a blob instead of beelining
+                                                #   to the world edge (a correlated random walk)
 
     # --- pheromone deposition / evaporation ---
     # deposit intensity = deposit_max * exp(-lambda * tau)
@@ -50,7 +53,9 @@ class ColonyParams:
 
     # --- defence: cautionary pheromone (paper sec. 4) ---
     cautionary_on: bool = False
-    patience_max: float = 250.0                 # rho_max
+    patience_max: float = 500.0                 # rho_max. Sweet spot: too low (~250) and caution
+                                                #   blankets the area before the real trail forms
+                                                #   (defence backfires); too high and it never warns.
     patience_refill_steps: int = 1              # t_p: steps to reset patience to rho_max on finding food
 
     # --- run control ---

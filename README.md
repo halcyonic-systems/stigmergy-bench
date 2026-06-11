@@ -47,7 +47,9 @@ solara run app.py                  # interactive dashboard
 
 - **`images/field.png`** — the pheromone field over time: a clean green food trail consolidating between nest and food, while detractors weave a red misleading-pheromone web (paper Figs 1/3).
 - **`images/heatmap.png`** — food delivered per cooperator across detractor fraction × misleading-pheromone evaporation. The red/blue boundary is the adversarial cliff (paper Fig 4).
-- **`solara run app.py`** — drive it live: raise the detractor fraction or slow the misleading-pheromone evaporation and watch foraging collapse, then toggle the cautionary defense and watch it partly recover.
+- **`solara run app.py`** — drive it live: raise the detractor fraction or slow the misleading-pheromone evaporation and watch foraging collapse, then toggle the cautionary defense and watch it partly recover. The dashboard's **About** panel carries the full legend and a guided walkthrough.
+
+For the protocol-theory framing (the "why this matters past ants" argument), see [`docs/one-pager.md`](docs/one-pager.md).
 
 ## Layout
 

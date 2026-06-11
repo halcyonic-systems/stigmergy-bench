@@ -71,8 +71,13 @@ class Ant(CellAgent):
                 best_val, best_heading = val, math.atan2(cy - self.y, cx - self.x)
 
         if best_val <= 0.0 or best_heading is None:
-            best_heading = self.heading  # no trail: keep course
-        noise = self.model.random.uniform(-p.turn_noise * math.pi, p.turn_noise * math.pi)
+            # No trail in range: wander widely so searchers fill a blob around the
+            # nest rather than walking straight to the world edge.
+            best_heading = self.heading
+            spread = p.wander_noise
+        else:
+            spread = p.turn_noise   # on a trail: small jitter, follow it tightly
+        noise = self.model.random.uniform(-spread * math.pi, spread * math.pi)
         return best_heading + noise
 
     # -- motion ----------------------------------------------------------- #
