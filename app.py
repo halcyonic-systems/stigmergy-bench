@@ -14,11 +14,15 @@ and field snapshots without Solara.
 from __future__ import annotations
 
 import solara
-from mesa.visualization import SolaraViz, make_space_component, make_plot_component, Slider
+from matplotlib.figure import Figure
+from mesa.visualization import SolaraViz, make_space_component, Slider
 from mesa.visualization.components import PropertyLayerStyle
+from mesa.visualization.utils import update_counter
 
 from src.model import ColonyModel
 from src.protocol import TO_FOOD
+
+TITLE_FS, LABEL_FS, LEG_FS = 12, 10, 9
 
 
 def agent_portrayal(agent):
@@ -73,15 +77,79 @@ reinforces the fake one and gets trapped.
 
 **The point (for protocol theory):** any coordination protocol whose shared
 medium cannot be authenticated has this cliff. The defence is a second-order
-trust layer, and it trades liveness for safety. The plots track exactly that:
-*food delivered / success* (liveness) against *fraction misled*, the share of the
-colony sitting in forged-pheromone territory right now (the trap).
+trust layer, and it trades liveness for safety. The two right-hand panels track
+exactly that. *Is the colony still foraging?* is food delivered per ant
+(liveness). *Is the colony trapped?* plots the share **misled** (sitting in
+forged trails now) against the share **successful** (reached food): watch them
+cross as an attack bites, and uncross when the defence works.
 """
 
 
+def pp_space(ax):
+    ax.set_title("Colony  ·  nest at centre, food in a far corner", fontsize=TITLE_FS)
+    ax.set_xticks([]); ax.set_yticks([])
+
+
+# mesa's space component renders well; keep it. mesa's plot component, by contrast,
+# hard-codes a default figure and crops with bbox_inches="tight", so the metric
+# charts come out tiny. We render those ourselves at a controlled size instead.
+SpaceView = make_space_component(
+    agent_portrayal=agent_portrayal,
+    propertylayer_portrayal=propertylayer_portrayal,
+    post_process=pp_space,
+)
+
+
 @solara.component
-def About(model):
-    solara.Markdown(ABOUT)
+def LinePlot(model, series, title, ylabel, ylim=None, legend=None):
+    """A model-metric line chart we size and label ourselves. `series` maps a
+    DataCollector column to a colour."""
+    update_counter.get()   # re-render on every model step
+    df = model.datacollector.get_model_vars_dataframe()
+    fig = Figure(figsize=(6.6, 3.4))
+    ax = fig.subplots()
+    for col, color in series.items():
+        ax.plot(df.index, df[col], color=color, linewidth=2.0)
+    ax.set_title(title, fontsize=TITLE_FS)
+    ax.set_xlabel("step", fontsize=LABEL_FS)
+    ax.set_ylabel(ylabel, fontsize=LABEL_FS)
+    ax.margins(x=0.01)
+    if ylim:
+        ax.set_ylim(*ylim)
+    if legend:
+        ax.legend(legend, fontsize=LEG_FS, loc="center right", framealpha=0.9)
+    fig.tight_layout()
+    solara.FigureMatplotlib(fig, format="png", bbox_inches="tight")
+
+
+@solara.component
+def Dashboard(model):
+    """Deliberate, width-capped layout: walkthrough on top (collapsed), the colony
+    as a hero panel, the two read-outs side by side beneath it."""
+    with solara.Column(gap="12px", style={"max-width": "1000px", "margin": "0 auto"}):
+        with solara.Details(summary="How to read this  —  legend & guided walkthrough", expand=False):
+            solara.Markdown(ABOUT)
+        solara.Markdown(
+            "**Colony** &nbsp; red = searching &nbsp;·&nbsp; gold = returning with food "
+            "&nbsp;·&nbsp; magenta × = detractor &nbsp;·&nbsp; green/red/gold washes = trails",
+            style={"font-size": "13px", "color": "#555"},
+        )
+        with solara.Card():
+            SpaceView(model)
+        with solara.Columns([1, 1], wrap=False):
+            with solara.Card():
+                LinePlot(
+                    model, {"food_delivered_per_coop": "tab:green"},
+                    "Liveness  ·  food delivered per ant", "food / ant",
+                )
+            with solara.Card():
+                LinePlot(
+                    model,
+                    {"fraction_misled": "tab:red", "fraction_successful": "tab:green"},
+                    "Capture vs success  ·  share of colony", "fraction (0–1)",
+                    ylim=(-0.02, 1.02),
+                    legend=["misled — stuck in forged trails", "successful — reached food"],
+                )
 
 
 model_params = {
@@ -97,15 +165,7 @@ model = ColonyModel(seed=42)
 
 page = SolaraViz(
     model,
-    components=[
-        make_space_component(
-            agent_portrayal=agent_portrayal,
-            propertylayer_portrayal=propertylayer_portrayal,
-        ),
-        make_plot_component(["food_delivered_per_coop", "fraction_successful"]),
-        make_plot_component(["fraction_misled"]),
-        About,
-    ],
+    components=[Dashboard],   # one composite component, laid out explicitly above
     model_params=model_params,
     name="Stigmergy Protocol Bench",
     play_interval=100,
