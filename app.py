@@ -14,6 +14,7 @@ and field snapshots without Solara.
 from __future__ import annotations
 
 import solara
+import mesa.visualization.solara_viz as _solara_viz
 from matplotlib.figure import Figure
 from mesa.visualization import SolaraViz, make_space_component, Slider
 from mesa.visualization.components import PropertyLayerStyle
@@ -23,6 +24,19 @@ from src.model import ColonyModel
 from src.protocol import TO_FOOD
 
 TITLE_FS, LABEL_FS, LEG_FS = 12, 10, 9
+
+
+# SolaraViz drops every component into a 12-column resizable grid and defaults each
+# to half-width ("w": 6), which crushes our single composite into ~470px. We use one
+# full-width component, so make it span all 12 columns.
+def _full_width_layout(num_components):
+    return [
+        {"i": i, "w": 12, "h": 36, "moved": False, "x": 0, "y": 36 * i}
+        for i in range(num_components)
+    ]
+
+
+_solara_viz.make_initial_grid_layout = _full_width_layout
 
 
 def agent_portrayal(agent):
