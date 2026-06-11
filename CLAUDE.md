@@ -22,7 +22,7 @@ solara run app.py              # interactive
 
 Pattern worth reusing for any mesa dashboard:
 - Params + run-state as `solara.use_reactive`; rebuild model via `solara.use_memo(build, dependencies=[...params, reset_nonce])` so a param change restarts the run.
-- A background `solara.use_thread(play_loop, dependencies=[playing, model])` that **steps several times per redraw and caps redraws at ~8/s**. Bumping a redraw counter every step trips Solara's "Too many renders" guard — decouple sim-rate from render-rate.
+- **ONE long-lived `solara.use_thread(run_loop, dependencies=[])`** that loops forever and gates stepping on `if playing.value:` inside, reading the model via a stable `holder` dict. Do NOT pass `dependencies=[playing, model]` with a `while playing.value:` body — the re-renders that the counter bumps trigger cancel that thread after ~2 frames, so Play looks dead. Decouple sim-rate from render-rate (steps/frame + a `time.sleep`, ~10 redraws/s) to dodge Solara's "too many renders" guard.
 - Isolate the per-frame figures in a child component (`LiveView`) that reads the counter; the sidebar/controls must NOT read it, or they redraw every frame.
 - Colony = matplotlib (`solara.FigureMatplotlib`); line charts = Plotly (`solara.FigurePlotly`, needs `anywidget` installed).
 

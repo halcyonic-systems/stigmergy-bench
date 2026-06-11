@@ -176,17 +176,26 @@ def Page():
         model.step()
         counter.set(counter.value + 1)
 
-    # Background play loop. Decouple sim-rate from render-rate: step several times
-    # per redraw and cap redraws at ~8/s, which keeps Solara's render loop happy
-    # (bumping the counter every step trips its "too many renders" guard).
-    def play_loop():
-        while playing.value:
-            for _ in range(steps_per_frame.value):
-                model.step()
-            counter.set(counter.value + 1)
-            time.sleep(0.12)
+    # A stable holder so the long-lived loop thread always sees the *current* model
+    # (use_memo rebuilds model on param change; the thread reads it live here).
+    holder = solara.use_memo(lambda: {}, dependencies=[])
+    holder["model"] = model
 
-    solara.use_thread(play_loop, dependencies=[playing.value, model])
+    # ONE long-lived background thread (empty deps -> started once, never restarted).
+    # It loops forever and gates stepping on `playing` inside, rather than being
+    # toggled via dependencies. Toggling the thread through deps gets it cancelled by
+    # the re-renders that counter bumps trigger (it dies after ~2 frames). Decouple
+    # sim-rate from render-rate: several steps per redraw, ~10 redraws/s, which also
+    # keeps Solara's "too many renders" guard happy.
+    def run_loop():
+        while True:
+            if playing.value:
+                for _ in range(steps_per_frame.value):
+                    holder["model"].step()
+                counter.set(counter.value + 1)
+            time.sleep(0.1)
+
+    solara.use_thread(run_loop, dependencies=[])
 
     # --- sidebar controls (do NOT read counter here, so they don't redraw per frame) ---
     with solara.Sidebar():
