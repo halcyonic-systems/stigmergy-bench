@@ -1,0 +1,15 @@
+# Core ABM framework — pinned to match local Halcyonic dev (rsc-endowment-abm)
+mesa==3.4.1
+networkx>=3.0.0
+
+# Data handling + analysis
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.8.0
+
+# Interactive visualization (SolaraViz). Pin solara to a known-good 3.x-compatible line.
+solara>=1.44.0
+altair>=5.0.0   # mesa.visualization.components hard-imports this
+
+# Testing
+pytest>=7.0.0

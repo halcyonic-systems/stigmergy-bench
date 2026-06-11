@@ -1,0 +1,1 @@
+"""Stigmergy protocol-fragility bench."""

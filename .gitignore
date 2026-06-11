@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+output/*.csv
+output/*.log
+output/*.pid
+.DS_Store
