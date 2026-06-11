@@ -39,17 +39,29 @@ def fraction_successful(model) -> float:
     return sum(1 for a in coop if a.food_collected > 0) / len(coop)
 
 
-def fraction_captured(model) -> float:
-    """Capture: fraction of cooperators still searching and never fed."""
+def fraction_misled(model) -> float:
+    """Capture: fraction of the colony currently standing in adversary-controlled
+    territory, i.e. searching cooperators on a cell where misleading pheromone
+    outweighs food pheromone.
+
+    Parameter-free and real-time: reads 0 at baseline (no misleading pheromone
+    exists), rises as the attack pulls ants into the forged web, and falls again
+    when the cautionary defence pulls them out. Unlike a "never fed" proxy, it
+    distinguishes "still searching" from "actively trapped" throughout a run.
+    """
     coop = _cooperators(model)
     if not coop:
         return 0.0
-    return sum(1 for a in coop if a.state == TO_FOOD and a.food_collected == 0) / len(coop)
+    misled = sum(
+        1 for a in coop
+        if a.state == TO_FOOD and model.mislead.data[a.x, a.y] > model.food.data[a.x, a.y]
+    )
+    return misled / len(coop)
 
 
 MODEL_REPORTERS = {
     "food_delivered_per_coop": food_delivered_per_cooperator,
     "food_collected_per_coop": food_collected_per_cooperator,
     "fraction_successful": fraction_successful,
-    "fraction_captured": fraction_captured,
+    "fraction_misled": fraction_misled,
 }

@@ -74,7 +74,8 @@ reinforces the fake one and gets trapped.
 **The point (for protocol theory):** any coordination protocol whose shared
 medium cannot be authenticated has this cliff. The defence is a second-order
 trust layer, and it trades liveness for safety. The plots track exactly that:
-*food delivered / success* (liveness) against *fraction captured* (the trap).
+*food delivered / success* (liveness) against *fraction misled*, the share of the
+colony sitting in forged-pheromone territory right now (the trap).
 """
 
 
@@ -102,10 +103,12 @@ page = SolaraViz(
             propertylayer_portrayal=propertylayer_portrayal,
         ),
         make_plot_component(["food_delivered_per_coop", "fraction_successful"]),
-        make_plot_component(["fraction_captured"]),
+        make_plot_component(["fraction_misled"]),
         About,
     ],
     model_params=model_params,
     name="Stigmergy Protocol Bench",
     play_interval=100,
+    render_interval=4,   # simulate 4 steps per redraw; the per-step redraw, not the
+                         # model, is the live bottleneck, so this ~4x's wall-clock speed
 )

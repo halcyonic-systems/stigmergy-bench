@@ -100,3 +100,15 @@ def test_cautionary_defence_improves_success_under_attack():
 def test_no_detractors_means_empty_mislead_channel():
     m = _run(steps=300)
     assert np.all(m.mislead.data == 0.0)
+
+
+def test_fraction_misled_is_zero_without_attack():
+    """Capture reads exactly 0 in a healthy colony: no forged pheromone exists,
+    so no ant can be standing in adversary territory."""
+    df = _run(steps=400).datacollector.get_model_vars_dataframe()
+    assert (df.fraction_misled == 0.0).all()
+
+
+def test_fraction_misled_rises_under_attack():
+    df = _run(detractor_frac=0.10, mislead_evap_mult=0.0).datacollector.get_model_vars_dataframe()
+    assert df.fraction_misled.max() > 0.0
