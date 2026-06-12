@@ -1,8 +1,12 @@
 # Stigmergy Protocol Bench
 
+[![Live demo](https://img.shields.io/badge/live_demo-online-2ea44f?style=for-the-badge)](https://stigmergy-bench-production.up.railway.app)
+
 A small, tunable agent-based model of **stigmergy as a coordination protocol**, and what happens to it under adversarial agents. It reimplements and generalizes Aswale, López, Ammartayakun, and Pinciroli, *"Hacking the Colony: On the Disruptive Effect of Misleading Pheromone and How to Defend Against It"* (AAMAS 2022, [arXiv:2202.01808](https://arxiv.org/abs/2202.01808)).
 
-![The dashboard: a colony foraging while detractors lay a forged trail web, with live capture-vs-liveness charts](images/dashboard.png)
+**▶ [Try it live in your browser](https://stigmergy-bench-production.up.railway.app)** — no install. Drive the colony, crank up the detractors until foraging collapses, then toggle the cautionary defense and watch it partly recover.
+
+[![The dashboard: a colony foraging while detractors lay a forged trail web, with live capture-vs-liveness charts](images/dashboard.png)](https://stigmergy-bench-production.up.railway.app)
 
 ## Why this exists
 
@@ -49,7 +53,7 @@ solara run app.py                  # interactive dashboard
 
 - **`images/field.png`** — the pheromone field over time: a clean green food trail consolidating between nest and food, while detractors weave a red misleading-pheromone web (paper Figs 1/3).
 - **`images/heatmap.png`** — food delivered per cooperator across detractor fraction × misleading-pheromone evaporation. The red/blue boundary is the adversarial cliff (paper Fig 4).
-- **`solara run app.py`** — drive it live: raise the detractor fraction or slow the misleading-pheromone evaporation and watch foraging collapse, then toggle the cautionary defense and watch it partly recover. The dashboard's **About** panel carries the full legend and a guided walkthrough.
+- **[live demo](https://stigmergy-bench-production.up.railway.app)** (or `solara run app.py` locally) — drive it live: raise the detractor fraction or slow the misleading-pheromone evaporation and watch foraging collapse, then toggle the cautionary defense and watch it partly recover. The dashboard's **About** panel carries the full legend and a guided walkthrough.
 
 For the protocol-theory framing (the "why this matters past ants" argument), see [`docs/one-pager.md`](docs/one-pager.md).
 
